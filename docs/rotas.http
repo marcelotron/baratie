@@ -1,0 +1,31 @@
+POST http://localhost:3000/criar_pedido
+Content-Type: application/json
+
+{
+    "prato": 1,
+    "preco": 10.55,
+    "mesa": 3
+}
+
+###
+
+POST http://localhost:3000/criar_mesa
+Content-Type: application/json
+
+{
+    "id": 2,
+    "status": "ocupado"
+}
+
+###
+
+GET http://localhost:3000/mostrar_mesas
+Content-Type: application/json
+
+###
+
+GET http://localhost:3000/mostrar_mesas/1
+
+###
+
+DELETE http://localhost:3000/deletar_mesa/1

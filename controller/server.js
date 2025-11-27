@@ -1,4 +1,4 @@
-import { Mesas } from './mesa.js';
+import { Mesas } from '../model/mesa.js';
 import express from 'express';
 
 const app = express();
