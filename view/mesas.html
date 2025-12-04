@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesas</title>
+    <link rel="stylesheet" href="src/styles/reset.css">
+    <link rel="stylesheet" href="src/styles/style.css">
+    <link rel="stylesheet" href="src/styles/mesas.css">
+</head>
+
+<body>
+    
+    <div class="banner">
+        <img src="src/img/BaratieImagens/MesasBanner.png" alt="MesasBanner">
+    </div>
+    <div class="container-mesas" id="container-mesas">
+        <!-- Mesas serão carregadas dinamicamente aqui -->
+    </div>
+
+    <script>
+        // Carrega as mesas do banco de dados
+        async function carregarMesas() {
+            try {
+                const response = await fetch('/api/mesas');
+                const data = await response.json();
+                
+                const container = document.getElementById('container-mesas');
+                container.innerHTML = ''; // Limpa o container
+                
+                if (data.mesas && data.mesas.length > 0) {
+                    data.mesas.forEach(mesa => {
+                        const mesaDiv = document.createElement('div');
+                        mesaDiv.className = 'mesa';
+                        mesaDiv.style.cursor = 'pointer';
+                        
+                        // Define a imagem baseada no status
+                        let imagemMesa = 'mesaOcupada.png';
+                        if (mesa.status === 'livre') {
+                            imagemMesa = 'mesaLivre.png';
+                        } else if (mesa.status === 'reservada') {
+                            imagemMesa = 'mesaReservada.png';
+                        }
+                        
+                        mesaDiv.innerHTML = `
+                            <p>Mesa ${mesa.numero}</p>
+                            <img src="src/img/BaratieImagens/mesaOcupada.png" alt="${mesa.status}">
+                            <p style="font-size: 14px; margin-top: 5px;">Status: ${mesa.status}</p>
+                        `;
+                        
+                        // Adiciona evento de clique para alterar status
+                        mesaDiv.addEventListener('click', () => alterarStatusMesa(mesa.id_mesa, mesa.status));
+                        
+                        container.appendChild(mesaDiv);
+                    });
+                } else {
+                    container.innerHTML = '<p style="color: white; text-align: center; width: 100%;">Nenhuma mesa cadastrada</p>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar mesas:', error);
+                alert('Erro ao carregar mesas. Verifique a conexão com o servidor.');
+            }
+        }
+
+        // Altera o status da mesa (livre -> ocupada -> reservada -> livre)
+        async function alterarStatusMesa(id, statusAtual) {
+            let novoStatus;
+            
+            if (statusAtual === 'livre') {
+                novoStatus = 'ocupada';
+            } else if (statusAtual === 'ocupada') {
+                novoStatus = 'reservada';
+            } else {
+                novoStatus = 'livre';
+            }
+            
+            try {
+                const response = await fetch(`/api/mesas/${id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status: novoStatus })
+                });
+                
+                if (response.ok) {
+                    carregarMesas(); // Recarrega as mesas
+                } else {
+                    alert('Erro ao atualizar status da mesa');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar mesa:', error);
+                alert('Erro ao atualizar status da mesa');
+            }
+        }
+
+        // Carrega as mesas quando a página é carregada
+        document.addEventListener('DOMContentLoaded', carregarMesas);
+    </script>
+</body>
+</html>

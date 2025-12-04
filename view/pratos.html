@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pratos</title>
+    <link rel="stylesheet" href="src/styles/reset.css">
+    <link rel="stylesheet" href="src/styles/style.css">
+    <link rel="stylesheet" href="src/styles/pratos.css">
+</head>
+<body>
+    <div class="banner">
+        <img src="src/img/BaratieImagens/PratosBanner.png" alt="MesasBanner">
+    </div>
+    <div class="container-pratos" id="container-pratos">
+        <!-- Pratos serão carregados dinamicamente aqui -->
+        
+        <a href="addPratos.html" class="add_prato">
+            <p style="color: white;">+</p>
+        </a>
+    </div>
+
+    <script>
+        // Carrega os pratos do banco de dados
+        async function carregarPratos() {
+            try {
+                const response = await fetch('/api/pratos');
+                const data = await response.json();
+                
+                const container = document.getElementById('container-pratos');
+                // Remove todos os elementos exceto o botão de adicionar
+                const addButton = container.querySelector('.add_prato');
+                container.innerHTML = '';
+                
+                if (data.pratos && data.pratos.length > 0) {
+                    data.pratos.forEach(prato => {
+                        const pratoDiv = document.createElement('div');
+                        pratoDiv.className = 'prato';
+                        
+                        // Define a imagem (usa a do banco ou uma padrão)
+                        const imagemPrato = prato.imagem || 'src/img/pratos/ImagemRealPrato.png';
+                        
+                        pratoDiv.innerHTML = `
+                            <div class="image-div">
+                                <img src="${imagemPrato}" alt="${prato.nome}" onerror="this.src='src/img/pratos/ImagemRealPrato.png'">
+                            </div>
+                            <p class="descricao">${prato.descricao || prato.nome_prato}</p>
+                            <p>R$ ${parseFloat(prato.preco).toFixed(2)}</p>
+                            <button onclick="deletarPrato(${prato.id_prato})" style="margin-top: 10px; padding: 5px 10px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer;">Excluir</button>
+                        `;
+                        
+                        container.appendChild(pratoDiv);
+                    });
+                } else {
+                    const mensagem = document.createElement('p');
+                    mensagem.style.color = 'white';
+                    mensagem.style.textAlign = 'center';
+                    mensagem.style.width = '100%';
+                    mensagem.textContent = 'Nenhum prato cadastrado';
+                    container.appendChild(mensagem);
+                }
+                
+                // Adiciona o botão de adicionar no final
+                container.appendChild(addButton);
+                
+            } catch (error) {
+                console.error('Erro ao carregar pratos:', error);
+                alert('Erro ao carregar pratos. Verifique a conexão com o servidor.');
+            }
+        }
+
+        // Deleta um prato
+        async function deletarPrato(id) {
+            if (!confirm('Tem certeza que deseja deletar este prato?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/pratos/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    alert('Prato deletado com sucesso!');
+                    carregarPratos(); // Recarrega os pratos
+                } else {
+                    alert('Erro ao deletar prato');
+                }
+            } catch (error) {
+                console.error('Erro ao deletar prato:', error);
+                alert('Erro ao deletar prato');
+            }
+        }
+
+        // Carrega os pratos quando a página é carregada
+        document.addEventListener('DOMContentLoaded', carregarPratos);
+    </script>
+</body>
+</html>

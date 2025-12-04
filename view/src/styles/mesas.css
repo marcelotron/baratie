@@ -1,0 +1,74 @@
+.container-mesas{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.mesa{
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1%;
+    position: relative;
+}
+.mesa img{
+    width: 100%;
+    /* background-color: blue; */
+}
+.mesa p{
+    font-size: 300%;
+    /* background-color: aqua; */
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    text-align: center;
+}
+
+
+
+@media (max-width: 415px) {
+  .mesa{
+    width: 150px;
+  }
+  .mesa p{
+    font-size: 28px;
+  }
+}
+@media (min-width: 416px) and (max-width: 600px) {
+  .mesa{
+    width: 200px;
+  }
+  .mesa p{
+    font-size: 250%;
+  }
+}
+@media (min-width: 601px) and (max-width: 1000px) {
+  .mesa{
+    width: 200px;
+  }
+  .mesa p{
+    font-size: 200%;
+  }
+
+}
+@media (min-width: 1000px) and (max-width: 1150px) {
+  .mesa{
+    width: 250px;
+  }
+  .mesa p{
+    font-size: 250%;
+  }
+}
+@media (min-width: 1151px) and (max-width: 1540px) {
+  .mesa{
+    width: 20%;
+  }   
+}
+@media (min-width: 1540px) {
+  .mesa{
+    width: 350px;
+  }   
+}

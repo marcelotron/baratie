@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AddPratos</title>
+    <link rel="stylesheet" href="src/styles/reset.css">
+    <link rel="stylesheet" href="src/styles/style.css">
+    <link rel="stylesheet" href="src/styles/addPratos.css">
+</head>
+<body>
+    <div class="banner">
+        <img src="src/img/BaratieImagens/addPratosBanner.png" alt="MesasBanner">
+    </div>
+    <div class="container-add-pratos">
+        <div class="first-column-add-pratos">
+            <form id="form-add-prato" action="">
+                <div class="div-inputs">
+                    <div class="upload-box">
+                        <label for="img-input">
+                            <img class="icon-upload" src="src/img/icons/cloud-upload.png" alt="Upload">
+                        </label>
+                        <input type="file" id="img-input" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="div-nome-prato">
+                        <textarea id="nome-prato" class="input-neon text-area-custom" placeholder="Nome do prato"></textarea>
+                    </div>
+                     <div class="div-preco-prato">
+                        <input type="number" id="preco-prato" class="input-neon small" placeholder="R$ 00.00" step="0.01">
+                    </div>
+                </div>
+                <div class="div-descricao-prato" style="margin-top: 10px;">
+                    <textarea id="descricao-prato" class="input-neon text-area-custom" placeholder="Descrição do prato" rows="3" style="width: 100%; box-sizing: border-box;"></textarea>
+                </div>
+                <div class="div-categoria-prato" style="margin-top: 5px;">
+                    <select id="categoria-prato" class="input-neon full-width" style="background-color: #000; color: #fff;">
+                        <option value="" style="background-color: #000; color: #fff;">Selecione a categoria</option>
+                        <option value="comida" style="background-color: #000; color: #fff;">Comida</option>
+                        <option value="bebida" style="background-color: #000; color: #fff;">Bebida</option>
+                    </select>
+                </div>
+                <div class="action-buttons" style="margin-top: 5px;">
+                    <button type="button" id="btn-limpar" class="btn-neon red">Limpar</button>
+                    <button type="button" id="btn-preview" class="btn-neon green">Adicionar ao Preview</button>
+                </div>
+            </form>
+        </div>
+        <div class="second-column-add-pratos">
+            <p class="title-second-column">Preview</p>
+            <div id="preview-container">
+                <!-- Pratos no preview serão adicionados aqui -->
+            </div>
+        </div>  
+        
+        <div class="add_prato" id="btn-adicionar-pratos">
+            <p>Adicionar Pratos</p>
+        </div>
+    </div>
+
+    <script>
+        let pratosPreview = [];
+        let imagemAtual = null;
+
+        // Limpa o formulário
+        document.getElementById('btn-limpar').addEventListener('click', function() {
+            document.getElementById('form-add-prato').reset();
+            imagemAtual = null;
+            document.querySelector('.icon-upload').src = 'src/img/icons/cloud-upload.png';
+        });
+
+        // Preview da imagem
+        document.getElementById('img-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagemAtual = event.target.result;
+                    document.querySelector('.icon-upload').src = imagemAtual;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Adiciona prato ao preview
+        document.getElementById('btn-preview').addEventListener('click', function() {
+            const nome = document.getElementById('nome-prato').value.trim();
+            const descricao = document.getElementById('descricao-prato').value.trim();
+            const preco = document.getElementById('preco-prato').value;
+            const categoria = document.getElementById('categoria-prato').value;
+
+            if (!nome || !preco || !categoria) {
+                alert('Preencha todos os campos obrigatórios!');
+                return;
+            }
+
+            const prato = {
+                nome_prato: nome,
+                descricao: descricao || null,
+                preco: parseFloat(preco),
+                categoria: categoria,
+                imagem: imagemAtual || 'src/img/pratos/ImagemRealPrato.png',
+                tipo_imagem: imagemAtual ? 'image/jpeg' : null
+            };
+
+            pratosPreview.push(prato);
+            atualizarPreview();
+            
+            // Limpa o formulário
+            document.getElementById('form-add-prato').reset();
+            imagemAtual = null;
+            document.querySelector('.icon-upload').src = 'src/img/icons/cloud-upload.png';
+        });
+
+        // Atualiza o preview
+        function atualizarPreview() {
+            const container = document.getElementById('preview-container');
+            container.innerHTML = '';
+
+            pratosPreview.forEach((prato, index) => {
+                const pratoDiv = document.createElement('div');
+                pratoDiv.className = 'prato';
+                pratoDiv.style.position = 'relative';
+                
+                pratoDiv.innerHTML = `
+                    <div class="image-div">
+                        <img src="${prato.imagem}" alt="${prato.nome_prato}">
+                    </div>
+                    <p class="descricao"><strong>${prato.nome_prato}</strong></p>
+                    ${prato.descricao ? `<p style="font-size: 0.9em; color: #ccc;">${prato.descricao}</p>` : ''}
+                    <p>R$ ${prato.preco.toFixed(2)}</p>
+                    
+                    <div class="trash-preview-prato" onclick="removerDoPreview(${index})" style="cursor: pointer;">
+                        <img src="src/img/icons/trash.png" alt="IconExcluirPreviewPrato">
+                    </div>
+
+                    <div class="categoria-preview-prato">
+                        <p>Categoria: ${prato.categoria}</p>
+                    </div>
+                `;
+                
+                container.appendChild(pratoDiv);
+            });
+        }
+
+        // Remove prato do preview
+        function removerDoPreview(index) {
+            pratosPreview.splice(index, 1);
+            atualizarPreview();
+        }
+
+        // Adiciona todos os pratos do preview ao banco de dados
+        document.getElementById('btn-adicionar-pratos').addEventListener('click', async function() {
+            if (pratosPreview.length === 0) {
+                alert('Adicione ao menos um prato ao preview!');
+                return;
+            }
+
+            try {
+                let sucessos = 0;
+                let erros = 0;
+
+                for (const prato of pratosPreview) {
+                    try {
+                        const response = await fetch('/api/pratos', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(prato)
+                        });
+
+                        if (response.ok) {
+                            sucessos++;
+                        } else {
+                            erros++;
+                        }
+                    } catch (error) {
+                        console.error('Erro ao adicionar prato:', error);
+                        erros++;
+                    }
+                }
+
+                if (sucessos > 0) {
+                    alert(`${sucessos} prato(s) adicionado(s) com sucesso!${erros > 0 ? ` ${erros} erro(s).` : ''}`);
+                    pratosPreview = [];
+                    atualizarPreview();
+                    
+                    // Redireciona para a página de pratos após 1 segundo
+                    setTimeout(() => {
+                        window.location.href = 'pratos.html';
+                    }, 1000);
+                } else {
+                    alert('Erro ao adicionar pratos. Tente novamente.');
+                }
+            } catch (error) {
+                console.error('Erro geral:', error);
+                alert('Erro ao adicionar pratos. Verifique a conexão com o servidor.');
+            }
+        });
+    </script>
+</body>
+</html>

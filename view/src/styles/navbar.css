@@ -1,0 +1,31 @@
+head{
+    background-color: red;
+}
+nav{
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    margin: 1em;
+    width: 100vw;
+    height: 100px;
+    background-color: rgb(124, 124, 124);
+    gap: 0;
+}
+.baratie-logo{
+    width: 100px;
+    background-color: red;
+    height: 50%;
+}
+nav ul{
+    display: flex;
+    justify-content: space-evenly;
+    text-align: center;
+    width: 70%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+nav ul li{
+    text-align: center;
+    font-size: 48px;
+}

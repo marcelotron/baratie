@@ -1,0 +1,87 @@
+.container-pratos{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    width: 100%;
+
+    gap: 1em;
+}
+
+.prato{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    box-shadow: #FDFFE1 0px 0px 10px 0px;
+    border-radius: 16px;
+    
+    padding: 1em;
+    width: 692px;
+    margin-bottom: 1.5em;
+}
+
+.prato:hover {
+    border-color: #fff;
+    box-shadow: #ffffff 0px 0px 10px 4px;
+    /* border: 1px solid #ffffff; */
+    transition: 0.3s;
+}
+
+.prato .image-div{
+    border-radius: 10px;
+
+    width: 97px;
+    height: 93px;
+    background-color: red;
+    
+}
+
+.prato img{
+    border-radius: 10px;
+
+    width: 97px;
+    height: 93px;
+    object-fit: cover;
+}
+
+.prato .descricao{
+    width: 445px;
+}
+
+.prato p{
+    font-size: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.add_prato{
+    text-align: center;
+    box-shadow: #FDFFE1 0px 0px 10px 0px;
+    border-radius: 16px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 32px;
+    
+    padding: 0.5em;
+    width: 80%;
+    margin-bottom: 1.5em;
+}
+
+
+
+
+@media (max-width: 415px) {
+
+}
+@media (min-width: 416px) and (max-width: 600px) {
+
+}
+@media (min-width: 601px) and (max-width: 1000px) {
+    
+}
+@media (min-width: 1000px) and (max-width: 1150px) {
+
+}
+@media (min-width: 1151px) and (max-width: 1540px) {
+    
+}
+@media (min-width: 1540px) {
+
+}
