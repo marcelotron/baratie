@@ -3,10 +3,20 @@ import { db } from '../controller/db.js';
 export class Pedidos {
     
     async create(id_mesa, id_prato, quantidade_unidade = 1, nome_cliente = null, observacao = null) {
+
         try {
+            const [pedidosAbertos] = await db.query(
+                'SELECT * FROM Pedido WHERE id_mesa = ? AND status_pedido = "aberto"',
+                [id_mesa]
+            );
+
+            if (pedidosAbertos.length > 0) {
+                throw new Error('Já existe um pedido aberto para esta mesa');
+            }
+        
             const [result] = await db.query(
-                'INSERT INTO Pedido (id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao) VALUES (?, ?, ?, ?, ?)',
-                [id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao]
+                'INSERT INTO Pedido (id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao, status_pedido) VALUES (?, ?, ?, ?, ?)',
+                [id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao, 'aberto']
             );
             return { 
                 id_pedido: result.insertId, 
@@ -14,7 +24,8 @@ export class Pedidos {
                 id_prato, 
                 quantidade_unidade, 
                 nome_cliente, 
-                observacao 
+                observacao, 
+                status_pedido: 'aberto'
             };
         } catch (error) {
             console.error('Erro ao criar pedido:', error);

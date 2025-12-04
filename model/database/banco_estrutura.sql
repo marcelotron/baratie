@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS Pedido (
     quantidade_unidade INT NOT NULL DEFAULT 1,
     nome_cliente VARCHAR(100),
     observacao TEXT,
+    status_pedido ENUM('aberto', 'fechado', 'cancelado') DEFAULT 'fechado',
     FOREIGN KEY (id_mesa) REFERENCES Mesa(id_mesa) ON DELETE CASCADE,
     FOREIGN KEY (id_prato) REFERENCES Prato(id_prato) ON DELETE CASCADE
 );
