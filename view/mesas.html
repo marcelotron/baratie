@@ -34,22 +34,14 @@
                         mesaDiv.className = 'mesa';
                         mesaDiv.style.cursor = 'pointer';
                         
-                        // Define a imagem baseada no status
-                        let imagemMesa = 'mesaOcupada.png';
-                        if (mesa.status === 'livre') {
-                            imagemMesa = 'mesaLivre.png';
-                        } else if (mesa.status === 'reservada') {
-                            imagemMesa = 'mesaReservada.png';
-                        }
-                        
                         mesaDiv.innerHTML = `
-                            <p>Mesa ${mesa.numero}</p>
-                            <img src="src/img/BaratieImagens/mesaOcupada.png" alt="${mesa.status}">
-                            <p style="font-size: 14px; margin-top: 5px;">Status: ${mesa.status}</p>
+                            <p>Mesa ${mesa.id_mesa}</p>
+                            <img src="src/img/BaratieImagens/mesaOcupada.png" alt="${mesa.status_atual}">
+                            <p style="font-size: 14px; margin-top: 5px;">Status: ${mesa.status_atual}</p>
                         `;
                         
                         // Adiciona evento de clique para alterar status
-                        mesaDiv.addEventListener('click', () => alterarStatusMesa(mesa.id_mesa, mesa.status));
+                        mesaDiv.addEventListener('click', () => alterarStatusMesa(mesa.id_mesa, mesa.status_atual));
                         
                         container.appendChild(mesaDiv);
                     });

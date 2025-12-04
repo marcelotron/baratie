@@ -10,13 +10,21 @@
 .prato{
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    align-items: center;
+    gap: 15px;
     box-shadow: #FDFFE1 0px 0px 10px 0px;
     border-radius: 16px;
     
     padding: 1em;
     width: 692px;
     margin-bottom: 1.5em;
+}
+
+.prato .info-prato {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 5px;
 }
 
 .prato:hover {

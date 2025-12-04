@@ -42,11 +42,14 @@
                         
                         pratoDiv.innerHTML = `
                             <div class="image-div">
-                                <img src="${imagemPrato}" alt="${prato.nome}" onerror="this.src='src/img/pratos/ImagemRealPrato.png'">
+                                <img src="${imagemPrato}" alt="${prato.nome_prato}" onerror="this.src='src/img/pratos/ImagemRealPrato.png'">
                             </div>
-                            <p class="descricao">${prato.descricao || prato.nome_prato}</p>
-                            <p>R$ ${parseFloat(prato.preco).toFixed(2)}</p>
-                            <button onclick="deletarPrato(${prato.id_prato})" style="margin-top: 10px; padding: 5px 10px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer;">Excluir</button>
+                            <div class="info-prato">
+                                <p style="font-weight: bold; font-size: 18px;">${prato.nome_prato}</p>
+                                <p style="font-size: 14px; color: #ccc;">${prato.descricao || 'Sem descrição'}</p>
+                            </div>
+                            <p style="font-size: 18px; font-weight: bold; color: #4CAF50; white-space: nowrap;">R$ ${parseFloat(prato.preco).toFixed(2)}</p>
+                            <button onclick="deletarPrato(${prato.id_prato})" style="padding: 8px 15px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap;">Excluir</button>
                         `;
                         
                         container.appendChild(pratoDiv);
