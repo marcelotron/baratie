@@ -6,11 +6,11 @@ export class Pedidos {
 
         try {
             const [pedidosAbertos] = await db.query(
-                'SELECT * FROM Pedido WHERE id_mesa = ? and status = "aberto"'
+                'SELECT * FROM Pedido WHERE id_mesa = ? AND status = "aberto"',
                 [id_mesa]
             );
 
-            if (pedidosAbertos.lenght > 0) {
+            if (pedidosAbertos.length > 0) {
                 throw new Error('Já existe um pedido aberto para esta mesa');
             }
         
