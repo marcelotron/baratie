@@ -244,6 +244,40 @@ app.post('/api/pedidos', async (req, res) => {
     }
 });
 
+// Rota para criar múltiplos pedidos de uma vez
+app.post('/api/pedidos/lote', async (req, res) => {
+    try {
+        const { pedidos: listaPedidos } = req.body;
+        
+        if (!listaPedidos || !Array.isArray(listaPedidos) || listaPedidos.length === 0) {
+            return res.status(400).json({
+                message: "Lista de pedidos inválida"
+            });
+        }
+        
+        const pedidosCriados = [];
+        
+        for (const pedido of listaPedidos) {
+            const { id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao } = pedido;
+            const pedidoCriado = await pedidos.create(id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao);
+            pedidosCriados.push(pedidoCriado);
+        }
+        
+        console.log(`${pedidosCriados.length} pedidos criados em lote`);
+        
+        return res.status(201).json({
+            message: `${pedidosCriados.length} pedidos criados com sucesso`,
+            pedidos: pedidosCriados
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Erro ao criar pedidos em lote",
+            error: error.message
+        });
+    }
+});
+
+
 app.get('/api/pedidos', async (req, res) => {
     try {
         const lista_pedidos = await pedidos.list();
@@ -399,6 +433,27 @@ app.delete('/api/pedidos/:id', async (req, res) => {
     }
 });
 
+// Deleta todos os pedidos de uma mesa (finalizar/fechar mesa)
+app.delete('/api/pedidos/mesa/:id_mesa', async (req, res) => {
+    try {
+        const id_mesa = req.params.id_mesa;
+        const resultado = await pedidos.deleteByMesa(id_mesa);
+        
+        console.log(`Todos os pedidos da mesa ${id_mesa} foram deletados`);
+        
+        return res.status(200).json({
+            message: `Todos os pedidos da mesa ${id_mesa} foram deletados com sucesso`,
+            deletados: resultado
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Erro ao deletar pedidos da mesa",
+            error: error.message
+        });
+    }
+});
+
+
 // ==================== ROTAS PARA SERVIR AS PÁGINAS ====================
 
 app.get('/', (req, res) => {
@@ -416,6 +471,23 @@ app.get('/pratos', (req, res) => {
 app.get('/add-pratos', (req, res) => {
     res.sendFile(path.join(__dirname, '../view/addPratos.html'));
 });
+
+app.get('/mesa', (req, res) => {
+    res.sendFile(path.join(__dirname, '../view/mesa.html'));
+});
+
+app.get('/pedidos', (req, res) => {
+    res.sendFile(path.join(__dirname, '../view/pedidos.html'));
+});
+
+app.get('/edit-prato', (req, res) => {
+    res.sendFile(path.join(__dirname, '../view/editPrato.html'));
+});
+
+app.get('/mesa-add-prato', (req, res) => {
+    res.sendFile(path.join(__dirname, '../view/mesaAddPrato.html'));
+});
+
 
 app.listen(port, function(){
     console.log("Servidor iniciado na porta " + port);

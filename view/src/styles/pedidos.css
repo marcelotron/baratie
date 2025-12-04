@@ -1,0 +1,16 @@
+.abrir-prato-div{
+    text-align: center;
+    box-shadow: #ffffff 0px 0px 10px 0px;
+    border-radius: 16px;
+    font-size: 32px;
+    
+    padding: 0.5em;
+    width: 80%;
+    margin-bottom: 1.5em;
+    cursor: pointer;
+}
+.abrir-prato-div:hover {
+    box-shadow: #8635dd 0px 0px 15px 4px;
+    border: 1px solid #ffffff;
+    transition: 0.3s;
+}

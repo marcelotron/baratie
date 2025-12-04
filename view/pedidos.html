@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos os Pedidos</title>
+    <link rel="stylesheet" href="src/styles/reset.css">
+    <link rel="stylesheet" href="src/styles/style.css">
+    <link rel="stylesheet" href="src/styles/mesa.css">
+    <link rel="stylesheet" href="src/styles/pedidos.css">
+</head>
+<body>
+    <div class="banner">
+        <img src="src/img/BaratieImagens/pedidosBanner.png" alt="PedidosBanner">
+    </div>
+
+    <div id="mesas-container">
+        <!-- Mesas serão carregadas dinamicamente aqui -->
+    </div>
+
+    <script>
+        // Carrega todas as mesas com pedidos
+        async function carregarTodasMesas() {
+            try {
+                const responseMesas = await fetch('/api/mesas');
+                const dataMesas = await responseMesas.json();
+                
+                const container = document.getElementById('mesas-container');
+                container.innerHTML = '';
+                
+                if (!dataMesas.mesas || dataMesas.mesas.length === 0) {
+                    container.innerHTML = '<p style="color: white; text-align: center; width: 100%; padding: 2em;">Nenhuma mesa cadastrada</p>';
+                    return;
+                }
+                
+                for (const mesa of dataMesas.mesas) {
+                    // Busca pedidos da mesa
+                    const responsePedidos = await fetch(`/api/pedidos/mesa/${mesa.id_mesa}`);
+                    const dataPedidos = await responsePedidos.json();
+                    
+                    if (!dataPedidos.pedidos || dataPedidos.pedidos.length === 0) {
+                        continue; // Pula mesas sem pedidos
+                    }
+                    
+                    let total = 0;
+                    dataPedidos.pedidos.forEach(pedido => {
+                        total += parseFloat(pedido.preco_unidade) * parseInt(pedido.quantidade_unidade);
+                    });
+                    
+                    // Cria seção da mesa
+                    const mesaSection = document.createElement('div');
+                    mesaSection.style.marginBottom = '4em';
+                    
+                    mesaSection.innerHTML = `
+                        <div class="container-info-mesa">
+                            <div class="container-mesa">
+                                <div class="mesa">
+                                    <p>Mesa ${mesa.id_mesa}</p>
+                                    <img src="src/img/BaratieImagens/mesaOcupada.png" alt="">
+                                </div>
+                                <div class="div-info-mesa">
+                                    <label>Total</label>
+                                    <p>R$ ${total.toFixed(2)}</p>
+                                </div>
+                            </div>
+                            <div class="container-mesa-direito">
+                                <img src="src/img/mesaImagens/ButtonRealizarPagamento.png" 
+                                     alt="Button-Img-Realizar-Pagamento" 
+                                     style="cursor: pointer;"
+                                     onclick="window.location.href='mesa.html?id=${mesa.id_mesa}'">
+                                <img src="src/img/mesaImagens/ButtonAdicionarPrato.png" 
+                                     alt="Button-Img-Adicionar-Prato" 
+                                     style="cursor: pointer;"
+                                     onclick="window.location.href='mesaAddPrato.html?id=${mesa.id_mesa}'">
+                            </div>
+                        </div>
+                        
+                        <div class="container-pratos-pedido">
+                            <div class="abrir-prato-div" data-mesa-id="${mesa.id_mesa}">
+                                <p>Abrir Pratos da Mesa ${mesa.id_mesa}</p>
+                            </div>
+
+                            <div class="pedidos-pratos" id="pedidos-mesa-${mesa.id_mesa}" style="display: none;">
+                                ${criarPratosHTML(dataPedidos.pedidos)}
+                            </div>
+                        </div>
+                        
+                        <hr style="margin: 4em;">
+                    `;
+                    
+                    container.appendChild(mesaSection);
+                }
+                
+                // Adiciona event listeners para abrir/fechar pratos
+                document.querySelectorAll('.abrir-prato-div').forEach(div => {
+                    div.addEventListener('click', function() {
+                        const mesaId = this.dataset.mesaId;
+                        const pedidosDiv = document.getElementById(`pedidos-mesa-${mesaId}`);
+                        const texto = this.querySelector('p');
+                        
+                        if (pedidosDiv.style.display === 'none') {
+                            pedidosDiv.style.display = 'flex';
+                            texto.textContent = `Fechar Pratos da Mesa ${mesaId}`;
+                        } else {
+                            pedidosDiv.style.display = 'none';
+                            texto.textContent = `Abrir Pratos da Mesa ${mesaId}`;
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Erro ao carregar mesas:', error);
+                alert('Erro ao carregar pedidos');
+            }
+        }
+
+        function criarPratosHTML(pedidos) {
+            return pedidos.map(pedido => {
+                const subtotal = parseFloat(pedido.preco_unidade) * parseInt(pedido.quantidade_unidade);
+                return `
+                    <div class="prato">
+                        <div class="image-div">
+                            <img src="${pedido.imagem || 'src/img/pratos/ImagemRealPrato.png'}" 
+                                 alt="${pedido.nome_prato}" 
+                                 onerror="this.src='src/img/pratos/ImagemRealPrato.png'">
+                        </div>
+                        <p class="descricao">${pedido.nome_prato}</p>
+                        <p>R$ ${parseFloat(pedido.preco_unidade).toFixed(2)}</p>
+                        
+                        <div class="trash-preview-prato" onclick="deletarPedido(${pedido.id_pedido})" style="cursor: pointer;">
+                            <img src="src/img/icons/trash.png" alt="Excluir">
+                        </div>
+
+                        <div class="categoria-preview-prato">
+                            <p>Subtotal: R$ ${subtotal.toFixed(2)}</p>
+                        </div>
+
+                        <div class="id_prato-preview-prato">
+                            <p>ID Pedido: ${pedido.id_pedido}</p>
+                        </div>
+
+                        <div class="quantidade-preview-prato">
+                            <p>Quantidade: </p>
+                            <input type="number" 
+                                   class="input-neon-pedidos-prato small" 
+                                   value="${pedido.quantidade_unidade}" 
+                                   min="1"
+                                   onchange="atualizarQuantidade(${pedido.id_pedido}, this.value)">
+                        </div>
+
+                        <div class="obs-preview-prato">
+                            <p>Obs: </p>
+                            <input type="text" 
+                                   class="input-neon-obs-pedidos-prato small" 
+                                   placeholder="Ex: Retirar Cebola" 
+                                   value="${pedido.observacao || ''}"
+                                   onchange="atualizarObservacao(${pedido.id_pedido}, this.value)">
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function deletarPedido(idPedido) {
+            if (!confirm('Tem certeza que deseja remover este pedido?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/pedidos/${idPedido}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    carregarTodasMesas();
+                } else {
+                    alert('Erro ao deletar pedido');
+                }
+            } catch (error) {
+                console.error('Erro ao deletar pedido:', error);
+                alert('Erro ao deletar pedido');
+            }
+        }
+
+        async function atualizarQuantidade(idPedido, quantidade) {
+            try {
+                const response = await fetch(`/api/pedidos/${idPedido}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ quantidade_unidade: quantidade })
+                });
+                
+                if (response.ok) {
+                    carregarTodasMesas();
+                } else {
+                    alert('Erro ao atualizar quantidade');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar quantidade:', error);
+                alert('Erro ao atualizar quantidade');
+            }
+        }
+
+        async function atualizarObservacao(idPedido, observacao) {
+            try {
+                const response = await fetch(`/api/pedidos/${idPedido}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ observacao: observacao })
+                });
+                
+                if (!response.ok) {
+                    alert('Erro ao atualizar observação');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar observação:', error);
+                alert('Erro ao atualizar observação');
+            }
+        }
+
+        // Carrega tudo ao abrir a página
+        document.addEventListener('DOMContentLoaded', carregarTodasMesas);
+    </script>
+</body>
+</html>

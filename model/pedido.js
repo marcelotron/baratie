@@ -3,19 +3,9 @@ import { db } from '../controller/db.js';
 export class Pedidos {
     
     async create(id_mesa, id_prato, quantidade_unidade = 1, nome_cliente = null, observacao = null) {
-
         try {
-            const [pedidosAbertos] = await db.query(
-                'SELECT * FROM Pedido WHERE id_mesa = ? AND status_pedido = "aberto"',
-                [id_mesa]
-            );
-
-            if (pedidosAbertos.length > 0) {
-                throw new Error('Já existe um pedido aberto para esta mesa');
-            }
-        
             const [result] = await db.query(
-                'INSERT INTO Pedido (id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao, status_pedido) VALUES (?, ?, ?, ?, ?)',
+                'INSERT INTO Pedido (id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao, status_pedido) VALUES (?, ?, ?, ?, ?, ?)',
                 [id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao, 'aberto']
             );
             return { 
@@ -65,9 +55,23 @@ export class Pedidos {
 
     async update(id, id_mesa, id_prato, quantidade_unidade, nome_cliente = null, observacao = null) {
         try {
+            // Busca o pedido atual
+            const [pedidoAtual] = await db.query('SELECT * FROM Pedido WHERE id_pedido = ?', [id]);
+            
+            if (pedidoAtual.length === 0) {
+                return false;
+            }
+            
+            // Usa os valores existentes se novos valores não forem fornecidos
+            const mesaFinal = id_mesa !== undefined ? id_mesa : pedidoAtual[0].id_mesa;
+            const pratoFinal = id_prato !== undefined ? id_prato : pedidoAtual[0].id_prato;
+            const quantidadeFinal = quantidade_unidade !== undefined ? quantidade_unidade : pedidoAtual[0].quantidade_unidade;
+            const clienteFinal = nome_cliente !== undefined ? nome_cliente : pedidoAtual[0].nome_cliente;
+            const observacaoFinal = observacao !== undefined ? observacao : pedidoAtual[0].observacao;
+            
             const [result] = await db.query(
                 'UPDATE Pedido SET id_mesa = ?, id_prato = ?, quantidade_unidade = ?, nome_cliente = ?, observacao = ? WHERE id_pedido = ?',
-                [id_mesa, id_prato, quantidade_unidade, nome_cliente, observacao, id]
+                [mesaFinal, pratoFinal, quantidadeFinal, clienteFinal, observacaoFinal, id]
             );
             return result.affectedRows > 0;
         } catch (error) {
@@ -95,6 +99,16 @@ export class Pedidos {
             return result.affectedRows > 0;
         } catch (error) {
             console.error('Erro ao deletar pedido:', error);
+            throw error;
+        }
+    }
+
+    async deleteByMesa(id_mesa) {
+        try {
+            const [result] = await db.query('DELETE FROM Pedido WHERE id_mesa = ?', [id_mesa]);
+            return result.affectedRows;
+        } catch (error) {
+            console.error('Erro ao deletar pedidos da mesa:', error);
             throw error;
         }
     }

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Prato</title>
+    <link rel="stylesheet" href="src/styles/reset.css">
+    <link rel="stylesheet" href="src/styles/style.css">
+    <link rel="stylesheet" href="src/styles/addPratos.css">
+</head>
+<body>
+    <div class="banner">
+        <img src="src/img/BaratieImagens/editPratosBanner.png" alt="EditPratosBanner">
+    </div>
+    <div class="container-add-pratos">
+        <div class="first-column-add-pratos">
+            <p class="title-second-column">Edite seu prato</p>
+            <form id="form-edit-prato" action="">
+                <input type="hidden" id="prato-id">
+                <div class="div-inputs">
+                    <div class="upload-box">
+                        <label for="img-input">
+                            <img class="icon-upload" src="src/img/icons/cloud-upload.png" alt="Upload" id="preview-img">
+                        </label>
+                        <input type="file" id="img-input" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="div-nome-prato">
+                        <textarea id="nome-prato" class="input-neon text-area-custom" placeholder="Nome do prato"></textarea>
+                    </div>
+                     <div class="div-preco-prato">
+                        <input type="number" id="preco-prato" class="input-neon small" placeholder="R$ 00.00" step="0.01">
+                    </div>
+                </div>
+                <div class="div-descricao-prato" style="margin-top: 10px;">
+                    <textarea id="descricao-prato" class="input-neon text-area-custom" placeholder="Descrição do prato" rows="3" style="width: 100%; box-sizing: border-box;"></textarea>
+                </div>
+                <div class="div-categoria-prato" style="margin-top: 5px;">
+                    <select id="categoria-prato" class="input-neon full-width" style="background-color: #000; color: #fff;">
+                        <option value="" style="background-color: #000; color: #fff;">Selecione a categoria</option>
+                        <option value="comida" style="background-color: #000; color: #fff;">Comida</option>
+                        <option value="bebida" style="background-color: #000; color: #fff;">Bebida</option>
+                    </select>
+                </div>
+                <div class="action-buttons" style="margin-top: 5px;">
+                    <button type="button" id="btn-cancelar" class="btn-neon red">Cancelar</button>
+                    <button type="button" id="btn-salvar" class="btn-neon green">Salvar Edição</button>
+                </div>
+            </form>
+        </div>
+        <div class="second-column-add-pratos">
+            <p class="title-second-column">Preview - Como irá ficar</p>
+            <div id="preview-container">
+                <!-- Preview será atualizado aqui -->
+            </div>
+        </div>  
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const pratoId = urlParams.get('id');
+        let imagemAtual = null;
+
+        // Carrega o prato para edição
+        async function carregarPrato() {
+            if (!pratoId) {
+                alert('ID do prato não fornecido');
+                window.location.href = 'pratos.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/pratos/${pratoId}`);
+                const prato = await response.json();
+                
+                document.getElementById('prato-id').value = prato.id_prato;
+                document.getElementById('nome-prato').value = prato.nome_prato;
+                document.getElementById('descricao-prato').value = prato.descricao || '';
+                document.getElementById('preco-prato').value = parseFloat(prato.preco);
+                document.getElementById('categoria-prato').value = prato.categoria;
+                
+                if (prato.imagem) {
+                    imagemAtual = prato.imagem;
+                    document.getElementById('preview-img').src = prato.imagem;
+                }
+                
+                atualizarPreview();
+            } catch (error) {
+                console.error('Erro ao carregar prato:', error);
+                alert('Erro ao carregar prato');
+            }
+        }
+
+        // Preview da imagem
+        document.getElementById('img-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagemAtual = event.target.result;
+                    document.getElementById('preview-img').src = imagemAtual;
+                    atualizarPreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Atualiza o preview
+        function atualizarPreview() {
+            const nome = document.getElementById('nome-prato').value.trim();
+            const descricao = document.getElementById('descricao-prato').value.trim();
+            const preco = document.getElementById('preco-prato').value;
+            const categoria = document.getElementById('categoria-prato').value;
+            
+            const container = document.getElementById('preview-container');
+            container.innerHTML = '';
+            
+            if (nome && preco) {
+                const pratoDiv = document.createElement('div');
+                pratoDiv.className = 'prato';
+                
+                pratoDiv.innerHTML = `
+                    <div class="image-div">
+                        <img src="${imagemAtual || 'src/img/pratos/ImagemRealPrato.png'}" alt="${nome}">
+                    </div>
+                    <p class="descricao"><strong>${nome}</strong></p>
+                    ${descricao ? `<p style="font-size: 0.9em; color: #ccc;">${descricao}</p>` : ''}
+                    <p>R$ ${parseFloat(preco).toFixed(2)}</p>
+                    
+                    <div class="categoria-preview-prato">
+                        <p>Categoria: ${categoria || 'Não definida'}</p>
+                    </div>
+                `;
+                
+                container.appendChild(pratoDiv);
+            }
+        }
+
+        // Event listeners para atualizar preview em tempo real
+        document.getElementById('nome-prato').addEventListener('input', atualizarPreview);
+        document.getElementById('descricao-prato').addEventListener('input', atualizarPreview);
+        document.getElementById('preco-prato').addEventListener('input', atualizarPreview);
+        document.getElementById('categoria-prato').addEventListener('change', atualizarPreview);
+
+        // Botão cancelar
+        document.getElementById('btn-cancelar').addEventListener('click', function() {
+            window.location.href = 'pratos.html';
+        });
+
+        // Botão salvar
+        document.getElementById('btn-salvar').addEventListener('click', async function() {
+            const id = document.getElementById('prato-id').value;
+            const nome = document.getElementById('nome-prato').value.trim();
+            const descricao = document.getElementById('descricao-prato').value.trim();
+            const preco = document.getElementById('preco-prato').value;
+            const categoria = document.getElementById('categoria-prato').value;
+
+            if (!nome || !preco || !categoria) {
+                alert('Preencha todos os campos obrigatórios!');
+                return;
+            }
+
+            const pratoAtualizado = {
+                nome_prato: nome,
+                descricao: descricao || null,
+                preco: parseFloat(preco),
+                categoria: categoria,
+                imagem: imagemAtual || null,
+                tipo_imagem: imagemAtual ? 'image/jpeg' : null
+            };
+
+            try {
+                const response = await fetch(`/api/pratos/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(pratoAtualizado)
+                });
+
+                if (response.ok) {
+                    alert('Prato atualizado com sucesso!');
+                    window.location.href = 'pratos.html';
+                } else {
+                    const error = await response.json();
+                    alert('Erro ao atualizar prato: ' + error.message);
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar prato:', error);
+                alert('Erro ao atualizar prato');
+            }
+        });
+
+        // Carrega o prato ao abrir a página
+        document.addEventListener('DOMContentLoaded', carregarPrato);
+    </script>
+</body>
+</html>

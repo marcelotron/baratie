@@ -40,8 +40,10 @@
                             <p style="font-size: 14px; margin-top: 5px;">Status: ${mesa.status_atual}</p>
                         `;
                         
-                        // Adiciona evento de clique para alterar status
-                        mesaDiv.addEventListener('click', () => alterarStatusMesa(mesa.id_mesa, mesa.status_atual));
+                        // Adiciona evento de clique para ir para detalhes da mesa
+                        mesaDiv.addEventListener('click', () => {
+                            window.location.href = `mesa.html?id=${mesa.id_mesa}`;
+                        });
                         
                         container.appendChild(mesaDiv);
                     });

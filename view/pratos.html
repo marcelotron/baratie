@@ -49,6 +49,7 @@
                                 <p style="font-size: 14px; color: #ccc;">${prato.descricao || 'Sem descrição'}</p>
                             </div>
                             <p style="font-size: 18px; font-weight: bold; color: #4CAF50; white-space: nowrap;">R$ ${parseFloat(prato.preco).toFixed(2)}</p>
+                            <button onclick="window.location.href='editPrato.html?id=${prato.id_prato}'" style="padding: 8px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; margin-right: 5px;">Editar</button>
                             <button onclick="deletarPrato(${prato.id_prato})" style="padding: 8px 15px; background: #ff4444; color: white; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap;">Excluir</button>
                         `;
                         
