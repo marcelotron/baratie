@@ -1,3 +1,4 @@
+// ...existing code...
 import request from 'supertest';
 import { app } from './server.js';
 
@@ -6,7 +7,7 @@ describe('Server Routes', () => {
   // ==================== TESTES DE MESAS ====================
   
   describe('POST /api/mesas', () => {
-    test('should create a new table', async () => {
+    test('deve criar uma nova mesa', async () => {
       const res = await request(app)
         .post('/api/mesas')
         .send({ status_atual: 'livre' });
@@ -18,7 +19,7 @@ describe('Server Routes', () => {
   });
 
   describe('GET /api/mesas', () => {
-    test('should list all tables', async () => {
+    test('deve listar todas as mesas', async () => {
       const res = await request(app).get('/api/mesas');
       
       expect(res.status).toBe(200);
@@ -28,7 +29,7 @@ describe('Server Routes', () => {
   });
 
   describe('GET /api/mesas/:id', () => {
-    test('should get a table by id', async () => {
+    test('deve obter uma mesa por id', async () => {
       const res = await request(app).get('/api/mesas/1');
       
       expect([200, 404, 500]).toContain(res.status);
@@ -36,7 +37,7 @@ describe('Server Routes', () => {
   });
 
   describe('PUT /api/mesas/:id/status', () => {
-    test('should update table status', async () => {
+    test('deve atualizar o status da mesa', async () => {
       const res = await request(app)
         .put('/api/mesas/1/status')
         .send({ status_atual: 'ocupada' });
@@ -46,7 +47,7 @@ describe('Server Routes', () => {
   });
 
   describe('DELETE /api/mesas/:id', () => {
-    test('should delete a table', async () => {
+    test('deve deletar uma mesa', async () => {
       const res = await request(app).delete('/api/mesas/999');
       
       expect([200, 404, 500]).toContain(res.status);
@@ -56,7 +57,7 @@ describe('Server Routes', () => {
   // ==================== TESTES DE PRATOS ====================
 
   describe('POST /api/pratos', () => {
-    test('should create a new dish', async () => {
+    test('deve criar um novo prato', async () => {
       const res = await request(app)
         .post('/api/pratos')
         .send({
@@ -76,7 +77,7 @@ describe('Server Routes', () => {
   });
 
   describe('GET /api/pratos', () => {
-    test('should list all dishes', async () => {
+    test('deve listar todos os pratos', async () => {
       const res = await request(app).get('/api/pratos');
       
       expect(res.status).toBe(200);
@@ -86,7 +87,7 @@ describe('Server Routes', () => {
   });
 
   describe('GET /api/pratos/:id', () => {
-    test('should get a dish by id', async () => {
+    test('deve obter um prato por id', async () => {
       const res = await request(app).get('/api/pratos/1');
       
       expect([200, 404, 500]).toContain(res.status);
@@ -94,7 +95,7 @@ describe('Server Routes', () => {
   });
 
   describe('GET /api/pratos/categoria/:categoria', () => {
-    test('should get dishes by category', async () => {
+    test('deve obter pratos por categoria', async () => {
       const res = await request(app).get('/api/pratos/categoria/comida');
       
       expect([200, 500]).toContain(res.status);
@@ -105,7 +106,7 @@ describe('Server Routes', () => {
   });
 
   describe('PUT /api/pratos/:id', () => {
-    test('should update a dish', async () => {
+    test('deve atualizar um prato', async () => {
       const res = await request(app)
         .put('/api/pratos/1')
         .send({
@@ -119,7 +120,7 @@ describe('Server Routes', () => {
   });
 
   describe('DELETE /api/pratos/:id', () => {
-    test('should delete a dish', async () => {
+    test('deve deletar um prato', async () => {
       const res = await request(app).delete('/api/pratos/999');
       
       expect([200, 404, 500]).toContain(res.status);
@@ -129,7 +130,7 @@ describe('Server Routes', () => {
   // ==================== TESTES DE PEDIDOS ====================
 
   describe('POST /api/pedidos', () => {
-    test('should create a new order', async () => {
+    test('deve criar um novo pedido', async () => {
       const res = await request(app)
         .post('/api/pedidos')
         .send({
@@ -145,7 +146,7 @@ describe('Server Routes', () => {
   });
 
   describe('GET /api/pedidos', () => {
-    test('should list all orders', async () => {
+    test('deve listar todos os pedidos', async () => {
       const res = await request(app).get('/api/pedidos');
       
       expect(res.status).toBe(200);
@@ -155,7 +156,7 @@ describe('Server Routes', () => {
   });
 
   describe('GET /api/pedidos/:id', () => {
-    test('should get an order by id', async () => {
+    test('deve obter um pedido por id', async () => {
       const res = await request(app).get('/api/pedidos/1');
       
       expect([200, 404, 500]).toContain(res.status);
@@ -163,7 +164,7 @@ describe('Server Routes', () => {
   });
 
   describe('GET /api/pedidos/mesa/:id_mesa', () => {
-    test('should get orders by table id', async () => {
+    test('deve obter pedidos por id da mesa', async () => {
       const res = await request(app).get('/api/pedidos/mesa/1');
       
       expect([200, 500]).toContain(res.status);
@@ -174,7 +175,7 @@ describe('Server Routes', () => {
   });
 
   describe('PUT /api/pedidos/:id/quantidade', () => {
-    test('should update order quantity', async () => {
+    test('deve atualizar a quantidade do pedido', async () => {
       const res = await request(app)
         .put('/api/pedidos/1/quantidade')
         .send({ quantidade_unidade: 5 });
@@ -184,7 +185,7 @@ describe('Server Routes', () => {
   });
 
   describe('GET /api/mesas/:id/total', () => {
-    test('should get table total', async () => {
+    test('deve obter o total da mesa', async () => {
       const res = await request(app).get('/api/mesas/1/total');
       
       expect([200, 500]).toContain(res.status);
@@ -194,17 +195,17 @@ describe('Server Routes', () => {
   // ==================== TESTES DE ROTAS ESTÁTICAS ====================
 
   describe('Static Routes', () => {
-    test('GET / should serve index.html', async () => {
+    test('GET / deve servir index.html', async () => {
       const res = await request(app).get('/');
       expect([200, 304]).toContain(res.status);
     });
 
-    test('GET /mesas should serve mesas.html', async () => {
+    test('GET /mesas deve servir mesas.html', async () => {
       const res = await request(app).get('/mesas');
       expect([200, 304]).toContain(res.status);
     });
 
-    test('GET /pratos should serve pratos.html', async () => {
+    test('GET /pratos deve servir pratos.html', async () => {
       const res = await request(app).get('/pratos');
       expect([200, 304]).toContain(res.status);
     });
